@@ -1,0 +1,21 @@
+rank,district,nearest_recorded_location,distance_km,Latitude,Longitude,high_cells,area_km2,mean_risk
+1,Raigad,Nive road,0.4,17.927,73.523,74,26.6,0.85
+2,Satara,Poladpur-Pratapgarh-,1.1,17.928,73.572,73,26.3,0.871
+3,Raigad,15 km away Poladpur via Kapde,1.3,18.028,73.573,70,25.2,0.861
+4,Raigad,11 km towards Northeast of,1.0,18.027,73.523,66,23.8,0.839
+5,Raigad,23km away Kamthe road via,1.7,18.029,73.62,65,23.4,0.837
+6,Raigad,Ombli- Ghogare-Khed Rd,2.9,17.926,73.474,65,23.4,0.832
+7,Pune,Varandh Ghat,2.7,17.978,73.62,63,22.7,0.829
+8,Raigad,26.2 km away from Mahad,1.9,18.076,73.573,62,22.3,0.845
+9,Raigad,Poladpur Kashedi road,1.5,17.924,73.425,61,22.0,0.853
+10,Sindhudurg,Karul -Bhattiwadti Road,0.8,16.526,73.82,61,22.0,0.826
+11,Pune,Varandh Ghat,3.0,18.076,73.617,56,20.2,0.832
+12,Raigad,Paithan -Ombli road,0.6,17.884,73.474,55,19.8,0.825
+13,Ratnagiri,Nive,3.6,17.678,73.673,55,19.8,0.78
+14,Satara,Poladpur-Pratapgarh-,0.6,17.929,73.62,54,19.4,0.838
+15,Sindhudurg,Bhui Bavda Ghat Road; SH-171,1.7,16.58,73.823,53,19.1,0.82
+16,Satara,Jor,4.2,18.03,73.673,52,18.7,0.798
+17,Raigad,Talachiwadi-Gowale road,1.6,17.977,73.574,51,18.4,0.825
+18,Ratnagiri,AkalpeAhire Rd,3.9,17.679,73.722,51,18.4,0.817
+19,Satara,Malusar,0.6,17.879,73.674,51,18.4,0.814
+20,Satara,Jor,1.4,17.979,73.672,51,18.4,0.797

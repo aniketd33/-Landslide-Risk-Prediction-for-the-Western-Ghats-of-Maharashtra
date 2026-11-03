@@ -1,0 +1,5 @@
+feature set,n_features,roc_auc,recall
+All features,11,0.832 +/- 0.011,0.803 +/- 0.030
+Without land cover,6,0.831 +/- 0.011,0.796 +/- 0.039
+Without slope,10,0.743 +/- 0.029,0.660 +/- 0.092
+Slope only,1,0.772 +/- 0.005,0.781 +/- 0.021

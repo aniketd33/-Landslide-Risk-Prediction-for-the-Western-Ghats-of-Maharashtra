@@ -1,0 +1,4 @@
+model,roc_auc_before,roc_auc_after,best_settings
+Logistic Regression,0.806,0.806,{'logisticregression__C': 1}
+Decision Tree,0.79,0.807,"{'max_depth': 3, 'min_samples_leaf': 1}"
+Random Forest,0.829,0.832,"{'max_depth': 12, 'min_samples_leaf': 5}"

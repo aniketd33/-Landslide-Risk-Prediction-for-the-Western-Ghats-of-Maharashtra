@@ -1,0 +1,7 @@
+factor,median_landslide,median_no_landslide,p_value,effect (0.5 = none),real_difference
+monsoon_rain_mm,2215.1,2251.7,4.40e-03,0.53,YES
+max_daily_rain_mm,109.9,116.5,8.82e-01,0.5,NO
+heavy_rain_days,5.0,6.0,3.56e-01,0.51,NO
+dist_river_m,3089.5,2867.2,3.16e-01,0.51,NO
+elev_m,529.4,549.8,3.18e-07,0.56,YES
+slope_deg,19.1,5.6,3.97e-165,0.81,YES

@@ -1,0 +1,13 @@
+{
+  "Logistic Regression": {
+    "logisticregression__C": 1
+  },
+  "Decision Tree": {
+    "max_depth": 3,
+    "min_samples_leaf": 1
+  },
+  "Random Forest": {
+    "max_depth": 12,
+    "min_samples_leaf": 5
+  }
+}
