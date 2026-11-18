@@ -9,10 +9,103 @@ from matplotlib.lines import Line2D
 import streamlit as st
 from scipy.ndimage import gaussian_filter
 
-st.set_page_config(page_title="Landslide Risk | Western Ghats", layout="wide")
+st.set_page_config(page_title="Landslide Risk | Western Ghats", page_icon="⛰️", layout="wide")
 
-BG = "#0E1117"
-COLORS = {"Low": "#2E7D32", "Moderate": "#FFB300", "High": "#FF1744"}
+CARD = "#111720"                      # panel colour (the map blends into it)
+COLORS = {"Low": "#2FA866", "Moderate": "#F5B94A", "High": "#FF3B52"}
+
+CSS = """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+:root{--bg:#0B0F14;--s1:#111720;--s2:#161D28;--bd:#242E3D;--tx:#E8EDF3;--mu:#8B98A9;--ac:#FF4D5E;--gold:#F5B94A;}
+.stApp{background:radial-gradient(1100px 520px at 88% -8%, rgba(255,77,94,.09), transparent 60%),var(--bg);}
+.stApp,.stMarkdown,.stMarkdown *,[data-testid="stMetric"] *,button[data-baseweb="tab"] *,
+[data-testid="stSidebar"] .stMarkdown *,[data-testid="stWidgetLabel"] p,[data-testid="stCaptionContainer"] *{
+  font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;}
+#MainMenu,footer{visibility:hidden;}
+header[data-testid="stHeader"]{background:transparent;}
+.block-container{padding-top:1.6rem;padding-bottom:3rem;max-width:1400px;}
+
+/* hero banner */
+.hero{position:relative;overflow:hidden;border:1px solid var(--bd);border-radius:18px;padding:26px 32px;margin:0 0 24px;
+  background:linear-gradient(120deg,#151C27 0%,#0F151D 55%,#1B1218 100%);box-shadow:0 10px 30px rgba(0,0,0,.35);}
+.hero:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--ac),var(--gold));}
+.hero:after{content:"";position:absolute;right:-70px;top:-90px;width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,77,94,.24),transparent 65%);}
+.hero-eyebrow{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:600;}
+.hero-title{font-size:2.3rem;font-weight:800;letter-spacing:-.025em;color:#fff;line-height:1.15;margin:.4rem 0 .25rem;}
+.hero-sub{color:var(--mu);font-size:1.02rem;}
+.chips span{display:inline-block;margin:16px 8px 0 0;padding:5px 13px;border:1px solid var(--bd);border-radius:999px;
+  font-size:.75rem;color:#C9D3DF;background:rgba(255,255,255,.03);}
+
+/* headings */
+.stApp h1{font-size:1.6rem;font-weight:700;letter-spacing:-.015em;color:var(--tx);padding:.2rem 0 .3rem;}
+.stApp h2{font-size:1.25rem;font-weight:700;color:var(--tx);margin-top:1.6rem;padding-bottom:.45rem;border-bottom:1px solid var(--bd);}
+.stApp h3{font-size:1.02rem;font-weight:600;color:var(--tx);}
+[data-testid="stCaptionContainer"]{color:var(--mu);}
+
+/* KPI cards */
+[data-testid="stMetric"]{background:linear-gradient(180deg,var(--s2),var(--s1));border:1px solid var(--bd);
+  border-top:2px solid var(--ac);border-radius:14px;padding:16px 20px;box-shadow:0 6px 20px rgba(0,0,0,.28);}
+[data-testid="stMetricLabel"] p{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);font-weight:600;}
+[data-testid="stMetricValue"]{font-size:1.95rem;font-weight:700;color:var(--tx);}
+
+/* panels (bordered containers) */
+[data-testid="stVerticalBlockBorderWrapper"]{background:var(--s1);border-color:var(--bd)!important;border-radius:16px;
+  box-shadow:0 6px 24px rgba(0,0,0,.25);}
+
+/* tabs */
+div[data-baseweb="tab-list"]{gap:6px;border-bottom:1px solid var(--bd);}
+button[data-baseweb="tab"]{height:46px;padding:0 20px;color:var(--mu);font-weight:600;}
+button[data-baseweb="tab"][aria-selected="true"]{color:#fff;}
+div[data-baseweb="tab-highlight"]{background:linear-gradient(90deg,var(--ac),var(--gold));height:3px;}
+
+/* sidebar */
+[data-testid="stSidebar"]{background:linear-gradient(180deg,#0E141C,#0B0F14);border-right:1px solid var(--bd);}
+.brand{display:flex;gap:12px;align-items:center;padding:6px 4px 18px;}
+.brand-mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--ac),#B3202F);
+  box-shadow:0 6px 16px rgba(255,77,94,.35);position:relative;}
+.brand-mark:after{content:"";position:absolute;left:9px;top:11px;border-left:10px solid transparent;border-right:10px solid transparent;
+  border-bottom:17px solid rgba(255,255,255,.92);}
+.brand-name{font-weight:700;font-size:1.12rem;color:#fff;line-height:1.2;}
+.brand-sub{font-size:.76rem;color:var(--mu);}
+.side-foot{margin-top:2.2rem;padding-top:1rem;border-top:1px solid var(--bd);font-size:.74rem;color:var(--mu);}
+[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);}
+[data-testid="stSidebar"] div[role="radiogroup"]{gap:6px;}
+[data-testid="stSidebar"] div[role="radiogroup"] label{padding:11px 14px;border-radius:11px;border:1px solid transparent;
+  transition:background .15s,border-color .15s;}
+[data-testid="stSidebar"] div[role="radiogroup"] label:hover{background:rgba(255,255,255,.04);}
+[data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child{display:none;}
+[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked){background:rgba(255,77,94,.13);
+  border-color:rgba(255,77,94,.4);}
+[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) p{color:#fff;font-weight:600;}
+
+/* risk badge */
+.risk-badge{display:inline-block;padding:7px 18px;border-radius:999px;font-weight:700;font-size:1.25rem;
+  color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);border:1px solid color-mix(in srgb,var(--c) 50%,transparent);
+  margin:4px 0 8px;}
+
+/* tables and alerts */
+[data-testid="stDataFrame"]{border:1px solid var(--bd);border-radius:12px;overflow:hidden;}
+[data-testid="stAlert"]{border-radius:12px;border:1px solid var(--bd);}
+[data-testid="stExpander"]{border:1px solid var(--bd);border-radius:12px;background:var(--s1);}
+</style>
+"""
+
+
+def inject_css():
+    st.markdown(CSS, unsafe_allow_html=True)
+
+
+def hero():
+    st.markdown(
+        '<div class="hero">'
+        '<div class="hero-eyebrow">Predictive Analytics Project</div>'
+        '<div class="hero-title">Landslide Risk Prediction</div>'
+        '<div class="hero-sub">Western Ghats of Maharashtra</div>'
+        '<div class="chips"><span>Susceptibility mapping</span><span>Spatial cross-validation</span>'
+        '<span>Decision support</span></div>'
+        '</div>', unsafe_allow_html=True)
 
 
 @st.cache_data
@@ -40,15 +133,15 @@ def draw_map(grid, show, slides, hot, show_slides, show_hot):
             rgba[cls_img == k] = (*rgb, alpha)
 
     fig, ax = plt.subplots(figsize=(6.2, 8.8))
-    fig.patch.set_facecolor(BG)
-    ax.set_facecolor(BG)
+    fig.patch.set_facecolor(CARD)
+    ax.set_facecolor(CARD)
     extent = [lon0 - step / 2, lon1 + step / 2, lat0 - step / 2, lat1 + step / 2]
     ax.imshow(rgba, extent=extent, origin="upper", interpolation="nearest")
 
     if "High" in show:                    # soft red glow around high-risk zones
         glow = gaussian_filter((cls_img == 2).astype(float), sigma=4)
         glow_rgba = np.zeros(cls_img.shape + (4,))
-        glow_rgba[..., 0], glow_rgba[..., 1], glow_rgba[..., 2] = 1.0, 0.09, 0.27
+        glow_rgba[..., 0], glow_rgba[..., 1], glow_rgba[..., 2] = 1.0, 0.23, 0.32
         glow_rgba[..., 3] = np.clip(glow * 1.6, 0, 0.55)
         ax.imshow(glow_rgba, extent=extent, origin="upper", interpolation="bilinear", zorder=1.5)
 
@@ -58,9 +151,9 @@ def draw_map(grid, show, slides, hot, show_slides, show_hot):
                    linewidths=0, zorder=3)
     if show_hot:
         ax.scatter(hot.Longitude, hot.Latitude, s=90, facecolors="none",
-                   edgecolors="#00E5FF", linewidths=1.1, zorder=4)
+                   edgecolors="#5CC8FF", linewidths=1.1, zorder=4)
         for _, r in hot.iterrows():
-            ax.annotate(str(int(r["rank"])), (r.Longitude, r.Latitude), color="#00E5FF",
+            ax.annotate(str(int(r["rank"])), (r.Longitude, r.Latitude), color="#5CC8FF",
                         fontsize=6, ha="center", va="center", zorder=5)
 
     ax.set_xlim(extent[0], extent[1])
@@ -68,7 +161,7 @@ def draw_map(grid, show, slides, hot, show_slides, show_hot):
     ax.set_aspect(1 / np.cos(np.radians(17.9)))
     ax.tick_params(colors="#8B949E", labelsize=8)
     for sp in ax.spines.values():
-        sp.set_color("#30363D")
+        sp.set_color("#242E3D")
     ax.set_xlabel("Longitude", color="#8B949E")
     ax.set_ylabel("Latitude", color="#8B949E")
 
@@ -79,9 +172,9 @@ def draw_map(grid, show, slides, hot, show_slides, show_hot):
                               markersize=4, label="Recorded landslide"))
     if show_hot:
         handles.append(Line2D([0], [0], marker="o", color="none", markerfacecolor="none",
-                              markeredgecolor="#00E5FF", markersize=8, label="Top 20 hotspot"))
-    leg = ax.legend(handles=handles, loc="lower left", facecolor="#161B22",
-                    edgecolor="#30363D", labelcolor="#E6EDF3", fontsize=8)
+                              markeredgecolor="#5CC8FF", markersize=8, label="Top 20 hotspot"))
+    leg = ax.legend(handles=handles, loc="lower left", facecolor="#161D28",
+                    edgecolor="#242E3D", labelcolor="#E6EDF3", fontsize=8)
     leg.get_frame().set_alpha(0.9)
     fig.tight_layout()
     return fig
@@ -99,33 +192,35 @@ def page_map(grid, slides, hot):
 
     left, right = st.columns([3, 2])
     with right:
-        st.subheader("Map controls")
-        show = st.multiselect("Risk classes to show", ["Low", "Moderate", "High"],
-                              default=["Low", "Moderate", "High"])
-        show_slides = st.checkbox("Show recorded landslides (white dots)", value=False)
-        show_hot = st.checkbox("Show top 20 hotspots (numbered rings)", value=True)
+        with st.container(border=True):
+            st.subheader("Map controls")
+            show = st.multiselect("Risk classes to show", ["Low", "Moderate", "High"],
+                                  default=["Low", "Moderate", "High"])
+            show_slides = st.checkbox("Show recorded landslides (white dots)", value=False)
+            show_hot = st.checkbox("Show top 20 hotspots (numbered rings)", value=True)
 
-        st.subheader("Check a location")
-        lat = st.number_input("Latitude", float(grid.Latitude.min()), float(grid.Latitude.max()),
-                              17.93, 0.01, format="%.3f")
-        lon = st.number_input("Longitude", float(grid.Longitude.min()), float(grid.Longitude.max()),
-                              73.52, 0.01, format="%.3f")
-        dx = (grid.Longitude - lon) * np.cos(np.radians(lat))
-        dy = grid.Latitude - lat
-        i = (dx ** 2 + dy ** 2).idxmin()
-        dist_km = float(np.sqrt(dx[i] ** 2 + dy[i] ** 2) * 111.0)
-        cls = grid.loc[i, "risk_class"]
-        st.markdown(
-            f"<div style='font-size:1.6rem;font-weight:700;color:{COLORS[cls]}'>{cls} risk</div>",
-            unsafe_allow_html=True)
-        st.write(f"Risk score: **{grid.loc[i, 'susceptibility']:.2f}** (0 = lowest, 1 = highest)")
-        if dist_km > 2:
-            st.warning("This point is far from the mapped area, so the score may not be reliable.")
+        with st.container(border=True):
+            st.subheader("Check a location")
+            lat = st.number_input("Latitude", float(grid.Latitude.min()), float(grid.Latitude.max()),
+                                  17.93, 0.01, format="%.3f")
+            lon = st.number_input("Longitude", float(grid.Longitude.min()), float(grid.Longitude.max()),
+                                  73.52, 0.01, format="%.3f")
+            dx = (grid.Longitude - lon) * np.cos(np.radians(lat))
+            dy = grid.Latitude - lat
+            i = (dx ** 2 + dy ** 2).idxmin()
+            dist_km = float(np.sqrt(dx[i] ** 2 + dy[i] ** 2) * 111.0)
+            cls = grid.loc[i, "risk_class"]
+            st.markdown(f"<div class='risk-badge' style='--c:{COLORS[cls]}'>{cls} risk</div>",
+                        unsafe_allow_html=True)
+            st.write(f"Risk score: **{grid.loc[i, 'susceptibility']:.2f}** (0 = lowest, 1 = highest)")
+            if dist_km > 2:
+                st.warning("This point is far from the mapped area, so the score may not be reliable.")
 
     with left:
-        fig = draw_map(grid, show, slides, hot, show_slides, show_hot)
-        st.pyplot(fig)
-        plt.close(fig)
+        with st.container(border=True):
+            fig = draw_map(grid, show, slides, hot, show_slides, show_hot)
+            st.pyplot(fig)
+            plt.close(fig)
 
     st.subheader("Top 20 hotspots")
     table = hot.rename(columns={
@@ -176,7 +271,8 @@ def page_models():
             st.subheader("ROC curves")
             st.line_chart(roc, x="fpr",
                           y=["Logistic Regression", "Decision Tree", "Random Forest", "Random guess"],
-                          x_label="False alarm rate", y_label="Landslide places found")
+                          x_label="False alarm rate", y_label="Landslide places found",
+                          color=["#5CC8FF", "#F5B94A", "#FF4D5E", "#6B7788"])
             st.caption("The higher and further left the curve, the better the model.")
         with c2:
             st.subheader("Confusion matrix")
@@ -201,7 +297,8 @@ def page_models():
         st.subheader("What the Random Forest relies on")
         df = imp.sort_values(ascending=False).reset_index()
         df.columns = ["Factor", "Importance"]
-        st.bar_chart(df, x="Factor", y="Importance", horizontal=True, sort="-Importance")
+        st.bar_chart(df, x="Factor", y="Importance", horizontal=True, sort="-Importance",
+                     color="#FF4D5E")
         st.write(f"Slope is the strongest factor ({imp['slope_deg']:.2f}). Monsoon rainfall "
                  f"({imp['monsoon_rain_mm']:.2f}), elevation ({imp['elev_m']:.2f}) and river "
                  f"distance ({imp['dist_river_log']:.2f}) come far behind. "
@@ -227,7 +324,8 @@ def page_models():
         c.metric("Places moved up a class", f"{int(row.moved_up):,}")
         d.metric("Places moved down a class", f"{int(row.moved_down):,}")
         st.line_chart(wi, x="rain_change_pct", y="pct_high",
-                      x_label="Change in monsoon rainfall (%)", y_label="High-risk share (%)")
+                      x_label="Change in monsoon rainfall (%)", y_label="High-risk share (%)",
+                      color="#FF4D5E")
         st.info("The effect is small and not steady. Rainfall is a weak factor in this data "
                 "(one year, coarse 25 km grid, landslide records without dates). "
                 "This shows how the model reacts to more rain. It is not a forecast of landslides.")
@@ -320,9 +418,15 @@ except FileNotFoundError as e:
     st.error(f"Missing file: {e.filename}. Check the data and figures folders.")
     st.stop()
 
-st.sidebar.title("Landslide Risk")
-st.sidebar.caption("Western Ghats of Maharashtra")
+inject_css()
+
+st.sidebar.markdown(
+    '<div class="brand"><div class="brand-mark"></div><div><div class="brand-name">Landslide Risk</div>'
+    '<div class="brand-sub">Western Ghats of Maharashtra</div></div></div>', unsafe_allow_html=True)
 page = st.sidebar.radio("Go to", ["Risk Map", "Models and What-If", "About"])
+st.sidebar.markdown('<div class="side-foot">Predictive Analytics Project</div>', unsafe_allow_html=True)
+
+hero()
 
 if page == "Risk Map":
     page_map(grid, slides, hot)
