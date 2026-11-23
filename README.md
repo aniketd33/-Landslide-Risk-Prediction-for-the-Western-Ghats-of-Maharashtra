@@ -183,3 +183,10 @@ Python, pandas, NumPy, scikit-learn, statsmodels, SciPy, matplotlib, seaborn, St
 ## 14. Author
 
 Aniket Dombale, Final-year B.Sc. Data Science, Department of Technology, SPPU, Pune.
+
+
+update on project  (23/11/2026)
+1. check 10 research paper on the project 
+2. find the gap and objective
+3.  that objective must in project
+
